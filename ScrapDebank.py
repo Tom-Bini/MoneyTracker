@@ -43,7 +43,9 @@ class ScrapDebank:
         self.btc_usd = yf.Ticker("BTC-USD").history(period="1d")["Close"].iloc[-1]
         
         options = Options()
-        options.headless = True
+        options.add_argument('--headless')  # Pour mode headless
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
 
         # Initialiser le driver Selenium pour Firefox
         self.driver = webdriver.Firefox(service=Service(GeckoDriverManager().install()), options=options)
