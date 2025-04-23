@@ -154,11 +154,8 @@ class RequestBankAccount:
     
     def get_assets(self, amounts):
         assets_list = []
-        print(amounts)
         for amount in amounts:
-            print(amount)
             amount = float(amount.replace(',', ''))
-            print("Amount : ", amount)
             assets_list.append(Asset("Euro", AssetType.FIAT, AssetSource.BELFIUS, self.timestamp, "EUR", self.usd_eur, self.btc_eur, self.btc_usd, amount, 1.0))
         return assets_list
 

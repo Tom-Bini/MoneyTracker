@@ -34,25 +34,27 @@ if hour % 6 == 0:
         hourlyRequestBank = RequestBankAccount(timestamp)
         accounts_list = hourlyRequestBank.get_accounts()
         balances = hourlyRequestBank.get_balances(accounts_list)
-        assets_list.extend(hourlyRequestBank.get_assets(balances))
-        do_sql_fallback = False
+        if balances != []:
+            do_sql_fallback = False
+            assets_list.extend(hourlyRequestBank.get_assets(balances))
+        
     except Exception as e:
         print(f"Problem : {e}")
 
 if do_sql_fallback:
     # S'exécute si l'heure n'est pas un multiple de 6 ou s'il y a un problème
-    # Calcul du timestamp de l'heure précédente
-    prev_time = rounded_time - timedelta(hours=1)
-    timestamp_prev_hour = prev_time.strftime("%Y-%m-%d %H")
-
+    
     query = """
         SELECT amount FROM assets
-        WHERE source = ? AND timestamp = ?
+        WHERE source = ?
+        ORDER BY timestamp DESC
+        LIMIT 1
     """
-    amounts_list = sql.fetch_all(query, ('Belfius', timestamp_prev_hour))
+    amounts_list = sql.fetch_all(query, ('Belfius',))
 
     # Extraire les montants depuis la liste de tuples
     amounts = [str(amount[0]) for amount in amounts_list]  # Accède à la première valeur de chaque tuple
+    print("Valeurs récupérées en dépit de :", amounts)
 
     # Passe la liste des montants extraits en argument à la fonction
     assets_list.extend(RequestBankAccount(timestamp).get_assets(amounts))

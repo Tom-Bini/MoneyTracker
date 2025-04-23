@@ -1,8 +1,8 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options  # Importer Options pour Firefox
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.firefox.service import Service  # Service pour Firefox
+from webdriver_manager.firefox import GeckoDriverManager  # Utilisation de GeckoDriverManager pour Firefox
 from selenium.webdriver.remote.webelement import WebElement
 from Asset import Asset
 from AssetType import AssetType
@@ -43,12 +43,12 @@ class ScrapDebank:
         self.btc_usd = yf.Ticker("BTC-USD").history(period="1d")["Close"].iloc[-1]
         
         options = Options()
-        options.add_argument('--headless')
+        options.add_argument('--headless')  # Pour mode headless
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
 
-        # Initialiser le driver Selenium
-        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        # Initialiser le driver Selenium pour Firefox
+        self.driver = webdriver.Firefox(service=Service(GeckoDriverManager().install()), options=options)
 
         # URL de la page DeBank
         self.url = f"https://debank.com/profile/{wallet}"
@@ -134,7 +134,7 @@ class ScrapDebank:
     def getProjectValueNotAccurate(self, project: WebElement):
         return project.find_element(By.CSS_SELECTOR, ".projectTitle-number").text.replace("$", "")
 
-    def getHoldAssets(self, hold_data: Dict[str, Dict[str, Union[str, float]]]):
+    def getHoldAssets(self, hold_data: Dict[str, Dict[str, Union[str, float]]] ):
         btc_tickers = {"BTC", "CBBTC", "WBTC"}
         usd_stables = {"USDC", "USDT", "USR", "DAI", "USDC.E", "USDT.E", "USD₮0"}
         eur_stables = {"EURC"}
@@ -159,10 +159,9 @@ class ScrapDebank:
         assets_list = []
         
         for data in defi_data:
-            assets_list.append(Asset(data["Protocol"], AssetType.DEFI, AssetSource.EVM, self.timestamp, "USD", self.usd_eur, self.btc_eur, self.btc_usd, value = data["Value"], wallet_name = self.wallet_name, defi_type = data["DeFi Type"]))
+            assets_list.append(Asset(data["Protocol"], AssetType.DEFI, AssetSource.EVM, self.timestamp, "USD", self.usd_eur, self.btc_eur, self.btc_usd, value = float(data["Value"]), wallet_name = self.wallet_name, defi_type = data["DeFi Type"]))
         return assets_list
         
     def kill(self):
         # Fermer le navigateur
         self.driver.quit()
-        
