@@ -1,8 +1,10 @@
 from RequestBankAccount import RequestBankAccount
 from ScrapDebank import ScrapDebank
+from ScrapSuiVision import ScrapSuiVision
 from datetime import datetime
 from InteractSQL import InteractSQL
 from wallets import wallets_evm
+from wallets import wallets_sui
 from datetime import timedelta
 from Asset import Asset
 
@@ -77,6 +79,12 @@ for wallet_name in wallets_evm:
     scraping.kill()
     
     print(f"Total assets to insert: {len(assets_list)}")
+    
+#Assets from SUI
+
+for wallet_name in wallets_sui:
+    wallet_address = wallets_evm[wallet_name]
+    scraping = ScrapSuiVision(wallet_address, wallet_name, timestamp)
 
 for asset in assets_list:
     print(f"Insertion de l'asset {asset}")

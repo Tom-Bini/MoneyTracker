@@ -4,3 +4,7 @@ wallets_evm = {
     "Farm auto test Wallet": "0xd5574ec4e804D63326b1EC9b26c34D014AC2ee6E",
     "Wallet paumé 1" : "0x611A3938e8cEBeFa98B75124B14Ef7e1496d7e21"
 }
+
+wallets_sui = {
+    "Ledger Main": "0xb9cd25f3777db149c61ce62a819dd4ad4935399095998a1e4b406d7d3979cb0a"
+}
