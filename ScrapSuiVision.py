@@ -84,7 +84,7 @@ class ScrapSuiVision:
         self.driver.get(self.url)
 
         print("Attente du chargement de la page...")
-        time.sleep(10)
+        time.sleep(15)
 
         self.hold_data = {}
         self.defi_data = {}
