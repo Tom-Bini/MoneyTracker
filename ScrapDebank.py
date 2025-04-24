@@ -8,7 +8,7 @@ from Asset import Asset
 from AssetType import AssetType
 from AssetSource import AssetSource
 import time
-import json
+import os
 from typing import Dict, Union
 from datetime import datetime
 import yfinance as yf
@@ -42,45 +42,56 @@ class ScrapDebank:
         self.btc_eur = yf.Ticker("BTC-EUR").history(period="1d")["Close"].iloc[-1]
         self.btc_usd = yf.Ticker("BTC-USD").history(period="1d")["Close"].iloc[-1]
         
-        # Configuration pour un serveur Linux
         options = Options()
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
-        options.add_argument('--disable-gpu')  # Important pour les serveurs sans GPU
+        options.add_argument('--disable-gpu')
+        options.add_argument('--window-size=1920,1080')
         
-        # Utiliser le binaire Firefox directement
-        options.binary_location = '/usr/bin/firefox'  # ou '/usr/bin/firefox-esr' selon l'installation
+        # Chemin explicite vers Firefox ESR
+        firefox_binary = '/usr/bin/firefox-esr'
+        if not os.path.exists(firefox_binary):
+            firefox_binary = '/usr/bin/firefox'
+        
+        options.binary_location = firefox_binary
         
         try:
-            # Méthode 1: Avec webdriver-manager (mais peut poser problème sur certains serveurs)
+            # Installation manuelle de geckodriver
             self.driver = webdriver.Firefox(
-                service=Service(GeckoDriverManager().install()),
-                options=options
+                options=options,
+                service=Service('/usr/local/bin/geckodriver')
             )
         except Exception as e:
-            print(f"Erreur avec webdriver-manager: {e}")
-            print("Essai avec geckodriver préinstallé...")
+            print(f"Erreur lors de l'initialisation du driver: {e}")
+            print("Essai avec configuration minimale...")
             
-            # Méthode 2: En utilisant un geckodriver préinstallé
+            # Tenter une configuration minimale
+            from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+            binary = FirefoxBinary(firefox_binary)
             self.driver = webdriver.Firefox(
-                service=Service('/usr/local/bin/geckodriver'),
-                options=options
+                firefox_binary=binary,
+                options=options,
+                service=Service('/usr/local/bin/geckodriver')
             )
-
+        
+        # Ajouter des timeouts plus importants
+        self.driver.set_page_load_timeout(180)
+        self.driver.implicitly_wait(60)
+        
         # URL de la page DeBank
         self.url = f"https://debank.com/profile/{wallet}"
         
-        # Ouvrir la page
+        print(f"Ouverture de l'URL: {self.url}")
         self.driver.get(self.url)
-
-        # Attendre que la page se charge (peut être ajusté selon la vitesse de la connexion)
-        time.sleep(20)
-
+        
+        print("Attente du chargement de la page...")
+        time.sleep(30)  # Augmenter le temps d'attente
+        
         # Dictionnaire pour stocker les données fusionnées par ticker
         self.hold_data = {}
         self.defi_data = {}
-
+    
     def getHoldingsData(self):
         hold_data = {}
         try:
