@@ -1,5 +1,5 @@
 #DECOMMENTER AVANT D'UPLOAD
-
+from seleniumbase import SB
 from selenium import webdriver
 #from selenium.webdriver.firefox.options import Options  # Importer Options pour Firefox
 from selenium.webdriver.common.by import By
@@ -41,41 +41,19 @@ def safe_float_convert(s: str) -> float:
     # Cas standard : float normal
     return float(s)
 
-class ScrapSuiVision:
-    def __init__(self, wallet: str, wallet_name: str, timestamp: str):
+class ScrapJupPortfolio:
+    def __init__(self, wallet: str, wallet_name: str, timestamp: str, sb: SB):
         self.wallet = wallet
         self.wallet_name = wallet_name
         self.timestamp = timestamp
         self.usd_eur = yf.Ticker("USDEUR=X").history(period="1d")["Close"].iloc[-1]
         self.btc_eur = yf.Ticker("BTC-EUR").history(period="1d")["Close"].iloc[-1]
         self.btc_usd = yf.Ticker("BTC-USD").history(period="1d")["Close"].iloc[-1]
-        
-        options = Options()
-        options.add_argument('--headless')
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
-        options.add_argument('--disable-gpu')
-        options.add_argument('--window-size=1920,1080')
-        
-# Chrome en mode normal (pas headless)
-        options = Options()
-        options.add_argument('--start-maximized')  # Ouvre la fenêtre en taille max
-
-        try:
-            self.driver = webdriver.Chrome(
-                service=Service(ChromeDriverManager().install()),
-                options=options
-            )
-        except Exception as e:
-            print(f"Erreur lors de l'initialisation du driver Chrome: {e}")
-            raise
-
-        self.driver.set_page_load_timeout(180)
-        self.driver.implicitly_wait(60)
 
         self.url = f"https://portfolio.jup.ag/portfolio/{wallet}"
         print(f"Ouverture de l'URL: {self.url}")
-        self.driver.get(self.url)
+        sb.uc_open_with_reconnect(self.url, 4)
+        sb.uc_gui_click_captcha()
 
         print("Attente du chargement de la page...")
         time.sleep(10)
@@ -83,22 +61,90 @@ class ScrapSuiVision:
         self.hold_data = {}
         self.defi_data = {}
     
-    def getHoldingsData(self):
+    def getHoldingsData(self, sb):
         hold_data = {}
         
-        
+        main = sb.find_element(By.TAG_NAME, 'main')
+        holding_details = main.find_element(By.TAG_NAME, 'details')
+        rows = holding_details.find_elements(By.TAG_NAME, 'tr')[1:]
+        for row in rows:
+            ticker = row.find_element(By.TAG_NAME, 'button').text
+            print(ticker)
+            span_list = row.find_elements(By.TAG_NAME, 'span')[1:]
+            amount = float(span_list[0].text.replace('$', ''))
+            print(amount)
+            price = float(span_list[1].text.replace('$', ''))
+            print(price)
+            value = span_list[2].text
+            if value != "<$0.01":
+                value = float(value.replace('$', ''))
+                hold_data[ticker] = {
+                    "ticker": ticker,
+                    "price": price,
+                    "amount": amount
+                }
+                
         return hold_data
         
-    def getDeFiPositionsData(self):
+    def getDeFiPositionsData(self, sb):
         data_list = []
-
-        except Exception as e:
-            print(f"Erreur lors de la récupération des projets : {e}")
+        main = sb.find_element(By.TAG_NAME, 'main')
+        defi_details = main.find_elements(By.TAG_NAME, 'details')[1:]
+        for detail in defi_details:
+            protocol = detail.find_element(By.TAG_NAME, 'p').text
+            print(protocol)
+            tabs = detail.find_elements(By.CSS_SELECTOR, '.rounded-jup.border.border-white\\/20.bg-surface')
+            for tab in tabs:
+                type = tab.find_element(By.TAG_NAME, 'span').text
+                
+                if type == 'Lending':
+                    type = 'Lending-Borrowing'
+                elif type == 'LiquidityPool':
+                    type = 'Liquidity Providing'
+                elif type == 'Staked' or type == 'Rewards':
+                    type = 'Staking'
+                print(type)
+                if type == 'Liquidity Providing':
+                    tr_list = tab.find_elements(By.TAG_NAME, 'tr')
+                    raw_value = tr_list[1].find_elements(By.TAG_NAME, 'span')[-1].text
+                    value = 0
+                    if raw_value != '<$0.01':
+                        value = raw_value.replace('$', '')
+                        print(value)
+                    if len(tr_list) > 2:
+                        reward = tr_list[3].find_elements(By.TAG_NAME, 'span')[-1].text
+                        if reward != "<$0.01":
+                            value += float(reward.replace('$', ''))
+                elif type == 'Staking':
+                    tr_list = tab.find_elements(By.TAG_NAME, 'tr')
+                    raw_value = tr_list[1].find_elements(By.TAG_NAME, 'span')[-1].text
+                    value = 0
+                    if raw_value != '<$0.01':
+                        value = raw_value.replace('$', '')
+                        print(value)
+                elif type == 'Lending-Borrowing':
+                    tr_list = tab.find_elements(By.TAG_NAME, 'tr')
+                    raw_supplied = tr_list[1].find_elements(By.TAG_NAME, 'span')[-1].text
+                    value = 0
+                    if raw_supplied != '<$0.01':
+                        value = raw_supplied.replace('$', '')
+                        print(value)
+                    if len(tr_list) > 2:
+                        borrowed = tr_list[3].find_elements(By.TAG_NAME, 'span')[-1].text
+                        if borrowed != "<$0.01":
+                            value -= float(borrowed.replace('$', '')) 
+                
+                
+                data = {
+                    "Protocol": protocol,
+                    "DeFi Type": type,
+                    "Value": value
+                }
+                
+                if value != 0:
+                    data_list.append(data)
             
         return data_list
-
-    def getProjectValueNotAccurate(self, project: WebElement):
-        return project.find_element(By.CSS_SELECTOR, ".projectTitle-number").text.replace("$", "")
 
     def getHoldAssets(self, hold_data: Dict[str, Dict[str, Union[str, float]]] ):
         btc_tickers = {"BTC", "CBBTC", "WBTC"}
@@ -133,22 +179,19 @@ class ScrapSuiVision:
         self.driver.quit()
         
 if __name__ == "__main__":
-
-        assets_list = []
+    assets_list = []
+    wallet_address = "DHmzvbLXE9HJWjS1P2SVAjTNV32sp4xWRMtbmn3TWFCi"
+    with SB(uc=True, test=True) as sb:
         
-        wallet_address = "0xb9cd25f3777db149c61ce62a819dd4ad4935399095998a1e4b406d7d3979cb0a"
-        scraping = ScrapSuiVision(wallet_address, "test", "0")
+        scraping = ScrapJupPortfolio(wallet_address, "test", "0", sb)
         
-        holding_data = scraping.getHoldingsData()
-        print(holding_data)
-        holdAssets = scraping.getHoldAssets(holding_data)
-        assets_list.extend(holdAssets)
-
-        data_list = scraping.getDeFiPositionsData()
-        print(data_list)
-        defiAssets = scraping.getDeFiAssets(data_list)
-        assets_list.extend(defiAssets)
+        holdings = scraping.getHoldingsData(sb)
+        hold_assets = scraping.getHoldAssets(holdings)
+        assets_list.extend(hold_assets)
         
-        scraping.kill()
+        defi = scraping.getDeFiPositionsData(sb)
+        defi_assets = scraping.getDeFiAssets(defi)
+        assets_list.extend(defi_assets)
         
         print(f"Total assets to insert: {len(assets_list)}")
+        
