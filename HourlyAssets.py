@@ -83,8 +83,22 @@ for wallet_name in wallets_evm:
 #Assets from SUI
 
 for wallet_name in wallets_sui:
-    wallet_address = wallets_evm[wallet_name]
+    wallet_address = wallets_sui[wallet_name]
     scraping = ScrapSuiVision(wallet_address, wallet_name, timestamp)
+    
+    holding_data = scraping.getHoldingsData()
+    print(holding_data)
+    holdAssets = scraping.getHoldAssets(holding_data)
+    assets_list.extend(holdAssets)
+
+    data_list = scraping.getDeFiPositionsData()
+    print(data_list)
+    defiAssets = scraping.getDeFiAssets(data_list)
+    assets_list.extend(defiAssets)
+    
+    scraping.kill()
+    
+    print(f"Total assets to insert: {len(assets_list)}")
 
 for asset in assets_list:
     print(f"Insertion de l'asset {asset}")
