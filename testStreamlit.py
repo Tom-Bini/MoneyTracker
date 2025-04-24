@@ -24,7 +24,7 @@ def pie_chart(df):
         values='value_in_EUR', 
         title="Répartition des assets par type",
         color='type',
-        color_discrete_map={'BTC': 'gold','Altcoins':'cyan','DeFi':'green','Fiat':'yellow'}
+        color_discrete_map={'BTC': '#32936F','Altcoins':'#26A96C','DeFi':'#2BC016','Fiat':'#387D7A'}
     )
     st.plotly_chart(fig)
 
