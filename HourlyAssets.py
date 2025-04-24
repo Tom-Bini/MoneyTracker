@@ -79,4 +79,5 @@ for wallet_name in wallets_evm:
     print(f"Total assets to insert: {len(assets_list)}")
 
 for asset in assets_list:
+    print(f"Insertion de l'asset {asset}")
     insert_asset(asset, sql)
