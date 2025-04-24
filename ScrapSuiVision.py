@@ -1,10 +1,8 @@
-#DECOMMENTER AVANT D'UPLOAD
-
 from selenium import webdriver
-#from selenium.webdriver.firefox.options import Options  # Importer Options pour Firefox
+from selenium.webdriver.firefox.options import Options  # Importer Options pour Firefox
 from selenium.webdriver.common.by import By
-#from selenium.webdriver.firefox.service import Service  # Service pour Firefox
-#from webdriver_manager.firefox import GeckoDriverManager  # Utilisation de GeckoDriverManager pour Firefox
+from selenium.webdriver.firefox.service import Service  # Service pour Firefox
+from webdriver_manager.firefox import GeckoDriverManager  # Utilisation de GeckoDriverManager pour Firefox
 from selenium.webdriver.remote.webelement import WebElement
 from Asset import Asset
 from AssetType import AssetType
@@ -15,12 +13,6 @@ from typing import Dict, Union
 from datetime import datetime
 import yfinance as yf
 import re
-
-#A RETIRER AVANT D'UPLOAD :
-
-from selenium.webdriver.chrome.options import Options  # Remplace l'import Firefox par Chrome
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 
 def safe_float_convert(s: str) -> float:
     # Mapping des chiffres en exposants Unicode vers int
@@ -57,19 +49,33 @@ class ScrapSuiVision:
         options.add_argument('--disable-gpu')
         options.add_argument('--window-size=1920,1080')
         
-# Chrome en mode normal (pas headless)
-        options = Options()
-        options.add_argument('--start-maximized')  # Ouvre la fenêtre en taille max
-
+        # Chemin explicite vers Firefox ESR
+        firefox_binary = '/usr/bin/firefox-esr'
+        if not os.path.exists(firefox_binary):
+            firefox_binary = '/usr/bin/firefox'
+        
+        options.binary_location = firefox_binary
+        
         try:
-            self.driver = webdriver.Chrome(
-                service=Service(ChromeDriverManager().install()),
-                options=options
+            # Installation manuelle de geckodriver
+            self.driver = webdriver.Firefox(
+                options=options,
+                service=Service('/usr/local/bin/geckodriver')
             )
         except Exception as e:
-            print(f"Erreur lors de l'initialisation du driver Chrome: {e}")
-            raise
-
+            print(f"Erreur lors de l'initialisation du driver: {e}")
+            print("Essai avec configuration minimale...")
+            
+            # Tenter une configuration minimale
+            from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+            binary = FirefoxBinary(firefox_binary)
+            self.driver = webdriver.Firefox(
+                firefox_binary=binary,
+                options=options,
+                service=Service('/usr/local/bin/geckodriver')
+            )
+        
+        # Ajouter des timeouts plus importants
         self.driver.set_page_load_timeout(180)
         self.driver.implicitly_wait(60)
 
