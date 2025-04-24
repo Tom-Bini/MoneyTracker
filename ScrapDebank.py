@@ -183,3 +183,23 @@ class ScrapDebank:
     def kill(self):
         # Fermer le navigateur
         self.driver.quit()
+        
+if __name__ == "__main__":
+    assets_list = []
+    
+    wallet_address = "0x9c7AaA2876517920041769f0D385f8cBb8893086"
+    scraping = ScrapDebank(wallet_address, "test", "0")
+    
+    holding_data = scraping.getHoldingsData()
+    print(holding_data)
+    holdAssets = scraping.getHoldAssets(holding_data)
+    assets_list.extend(holdAssets)
+
+    data_list = scraping.getDeFiPositionsData()
+    print(data_list)
+    defiAssets = scraping.getDeFiAssets(data_list)
+    assets_list.extend(defiAssets)
+    
+    scraping.kill()
+    
+    print(f"Total assets to insert: {len(assets_list)}")
