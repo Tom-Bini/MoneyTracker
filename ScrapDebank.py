@@ -86,7 +86,7 @@ class ScrapDebank:
         self.driver.get(self.url)
         
         print("Attente du chargement de la page...")
-        time.sleep(30)  # Augmenter le temps d'attente
+        time.sleep(10)  # Augmenter le temps d'attente
         
         # Dictionnaire pour stocker les données fusionnées par ticker
         self.hold_data = {}
