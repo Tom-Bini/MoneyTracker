@@ -42,13 +42,31 @@ class ScrapDebank:
         self.btc_eur = yf.Ticker("BTC-EUR").history(period="1d")["Close"].iloc[-1]
         self.btc_usd = yf.Ticker("BTC-USD").history(period="1d")["Close"].iloc[-1]
         
+        # Configuration pour un serveur Linux
         options = Options()
-        options.add_argument('--headless')  # Pour mode headless
+        options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
-
-        # Initialiser le driver Selenium pour Firefox
-        self.driver = webdriver.Firefox(service=Service(GeckoDriverManager().install()), options=options)
+        options.add_argument('--disable-gpu')  # Important pour les serveurs sans GPU
+        
+        # Utiliser le binaire Firefox directement
+        options.binary_location = '/usr/bin/firefox'  # ou '/usr/bin/firefox-esr' selon l'installation
+        
+        try:
+            # Méthode 1: Avec webdriver-manager (mais peut poser problème sur certains serveurs)
+            self.driver = webdriver.Firefox(
+                service=Service(GeckoDriverManager().install()),
+                options=options
+            )
+        except Exception as e:
+            print(f"Erreur avec webdriver-manager: {e}")
+            print("Essai avec geckodriver préinstallé...")
+            
+            # Méthode 2: En utilisant un geckodriver préinstallé
+            self.driver = webdriver.Firefox(
+                service=Service('/usr/local/bin/geckodriver'),
+                options=options
+            )
 
         # URL de la page DeBank
         self.url = f"https://debank.com/profile/{wallet}"
