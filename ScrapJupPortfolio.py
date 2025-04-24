@@ -73,7 +73,7 @@ class ScrapSuiVision:
         self.driver.set_page_load_timeout(180)
         self.driver.implicitly_wait(60)
 
-        self.url = f"https://suivision.xyz/account/{wallet}?tab=Portfolio"
+        self.url = f"https://portfolio.jup.ag/portfolio/{wallet}"
         print(f"Ouverture de l'URL: {self.url}")
         self.driver.get(self.url)
 
@@ -86,57 +86,11 @@ class ScrapSuiVision:
     def getHoldingsData(self):
         hold_data = {}
         
-        try:
-            div_portfolio = self.driver.find_elements(By.CSS_SELECTOR, ".whitespace-nowrap")[2]
-            tr_portfolio = div_portfolio.find_elements(By.TAG_NAME, "tr")
-            for row in tr_portfolio[1:]:
-                price = row.find_element(By.CSS_SELECTOR, "td:nth-child(3)").text
-                match = re.search(r"\$([\d.]+)", price)
-                if match:
-                    extracted_price = match.group(1)
-                    # 3. Amount (ex: "1.015621806") → dans la 4e cellule <td>
-                    amount_ticker = row.find_element(By.CSS_SELECTOR, "td:nth-child(4)").text
-                    amount_str, ticker = amount_ticker.split()
-                    amount = float(amount_str)
-                if price == 0:
-                    continue
-                elif ticker in hold_data:
-                    hold_data[ticker]['amount'] += amount
-                    # Le prix peut être mis à jour avec le dernier trouvé
-                    hold_data[ticker]['price'] = extracted_price
-                else:
-                    # Ajouter une nouvelle entrée pour ce ticker
-                    hold_data[ticker] = {
-                        "ticker": ticker,
-                        "price": float(extracted_price),
-                        "amount": amount
-                    }
-                
-        except Exception as e:
-            print("Erreur lors du chargement des tr : ", e)
-            print("Dernière ligne analysée : ", row.text)
         
         return hold_data
         
     def getDeFiPositionsData(self):
         data_list = []
-
-        try:
-            main = self.driver.find_element(By.TAG_NAME, 'main')
-            sections = main.find_elements(By.TAG_NAME, 'section')[1:]
-            for section in sections:
-                protocol_element = section.find_element(By.TAG_NAME, "h2")
-                protocol, value = protocol_element.text.strip().replace('$', '').split()
-
-                type = "Lending Borrowing"
-
-                data = {
-                    "Protocol": protocol,
-                    "DeFi Type": type,
-                    "Value": float(value)
-                }
-                
-                data_list.append(data)
 
         except Exception as e:
             print(f"Erreur lors de la récupération des projets : {e}")
