@@ -75,87 +75,91 @@ class ScrapJupPortfolio:
     
     def getHoldingsData(self, sb):
         hold_data = {}
-        
-        main = sb.find_element(By.TAG_NAME, 'main')
-        holding_details = main.find_element(By.TAG_NAME, 'details')
-        rows = holding_details.find_elements(By.TAG_NAME, 'tr')[1:]
-        for row in rows:
-            ticker = row.find_element(By.TAG_NAME, 'button').text
-            print(ticker)
-            span_list = row.find_elements(By.TAG_NAME, 'span')[1:]
-            amount = float(span_list[0].text.replace('$', ''))
-            print(amount)
-            price = float(span_list[1].text.replace('$', ''))
-            print(price)
-            value = span_list[2].text
-            if value != "<$0.01":
-                value = float(value.replace('$', ''))
-                hold_data[ticker] = {
-                    "ticker": ticker,
-                    "price": price,
-                    "amount": amount
-                }
+        try:    
+            main = sb.find_element(By.TAG_NAME, 'main')
+            holding_details = main.find_element(By.TAG_NAME, 'details')
+            rows = holding_details.find_elements(By.TAG_NAME, 'tr')[1:]
+            for row in rows:
+                ticker = row.find_element(By.TAG_NAME, 'button').text
+                print(ticker)
+                span_list = row.find_elements(By.TAG_NAME, 'span')[1:]
+                amount = float(span_list[0].text.replace('$', ''))
+                print(amount)
+                price = float(span_list[1].text.replace('$', ''))
+                print(price)
+                value = span_list[2].text
+                if value != "<$0.01":
+                    value = float(value.replace('$', ''))
+                    hold_data[ticker] = {
+                        "ticker": ticker,
+                        "price": price,
+                        "amount": amount
+                    }
+        except Exception as e:
+            print(f"Problem : {e}")
                 
         return hold_data
         
     def getDeFiPositionsData(self, sb):
         data_list = []
-        main = sb.find_element(By.TAG_NAME, 'main')
-        defi_details = main.find_elements(By.TAG_NAME, 'details')[1:]
-        for detail in defi_details:
-            protocol = detail.find_element(By.TAG_NAME, 'p').text
-            print(protocol)
-            tabs = detail.find_elements(By.CSS_SELECTOR, '.rounded-jup.border.border-white\\/20.bg-surface')
-            for tab in tabs:
-                type = tab.find_element(By.TAG_NAME, 'span').text
-                
-                if type == 'Lending':
-                    type = 'Lending-Borrowing'
-                elif type == 'LiquidityPool':
-                    type = 'Liquidity Providing'
-                elif type == 'Staked' or type == 'Rewards':
-                    type = 'Staking'
-                print(type)
-                if type == 'Liquidity Providing':
-                    tr_list = tab.find_elements(By.TAG_NAME, 'tr')
-                    raw_value = tr_list[1].find_elements(By.TAG_NAME, 'span')[-1].text
-                    value = 0
-                    if raw_value != '<$0.01':
-                        value = float(raw_value.replace('$', ''))
-                        print(value)
-                    if len(tr_list) > 2:
-                        reward = tr_list[3].find_elements(By.TAG_NAME, 'span')[-1].text
-                        if reward != "<$0.01":
-                            value += float(reward.replace('$', ''))
-                elif type == 'Staking':
-                    tr_list = tab.find_elements(By.TAG_NAME, 'tr')
-                    raw_value = tr_list[1].find_elements(By.TAG_NAME, 'span')[-1].text
-                    value = 0
-                    if raw_value != '<$0.01':
-                        value = raw_value.replace('$', '')
-                        print(value)
-                elif type == 'Lending-Borrowing':
-                    tr_list = tab.find_elements(By.TAG_NAME, 'tr')
-                    raw_supplied = tr_list[1].find_elements(By.TAG_NAME, 'span')[-1].text
-                    value = 0
-                    if raw_supplied != '<$0.01':
-                        value = float(raw_supplied.replace('$', ''))
-                        print(value)
-                    if len(tr_list) > 2:
-                        borrowed = tr_list[3].find_elements(By.TAG_NAME, 'span')[-1].text
-                        if borrowed != "<$0.01":
-                            value -= float(borrowed.replace('$', '')) 
-                
-                
-                data = {
-                    "Protocol": protocol,
-                    "DeFi Type": type,
-                    "Value": value
-                }
-                
-                if value != 0:
-                    data_list.append(data)
-            
+        try:
+            main = sb.find_element(By.TAG_NAME, 'main')
+            defi_details = main.find_elements(By.TAG_NAME, 'details')[1:]
+            for detail in defi_details:
+                protocol = detail.find_element(By.TAG_NAME, 'p').text
+                print(protocol)
+                tabs = detail.find_elements(By.CSS_SELECTOR, '.rounded-jup.border.border-white\\/20.bg-surface')
+                for tab in tabs:
+                    type = tab.find_element(By.TAG_NAME, 'span').text
+                    
+                    if type == 'Lending':
+                        type = 'Lending-Borrowing'
+                    elif type == 'LiquidityPool':
+                        type = 'Liquidity Providing'
+                    elif type == 'Staked' or type == 'Rewards':
+                        type = 'Staking'
+                    print(type)
+                    if type == 'Liquidity Providing':
+                        tr_list = tab.find_elements(By.TAG_NAME, 'tr')
+                        raw_value = tr_list[1].find_elements(By.TAG_NAME, 'span')[-1].text
+                        value = 0
+                        if raw_value != '<$0.01':
+                            value = float(raw_value.replace('$', ''))
+                            print(value)
+                        if len(tr_list) > 2:
+                            reward = tr_list[3].find_elements(By.TAG_NAME, 'span')[-1].text
+                            if reward != "<$0.01":
+                                value += float(reward.replace('$', ''))
+                    elif type == 'Staking':
+                        tr_list = tab.find_elements(By.TAG_NAME, 'tr')
+                        raw_value = tr_list[1].find_elements(By.TAG_NAME, 'span')[-1].text
+                        value = 0
+                        if raw_value != '<$0.01':
+                            value = raw_value.replace('$', '')
+                            print(value)
+                    elif type == 'Lending-Borrowing':
+                        tr_list = tab.find_elements(By.TAG_NAME, 'tr')
+                        raw_supplied = tr_list[1].find_elements(By.TAG_NAME, 'span')[-1].text
+                        value = 0
+                        if raw_supplied != '<$0.01':
+                            value = float(raw_supplied.replace('$', ''))
+                            print(value)
+                        if len(tr_list) > 2:
+                            borrowed = tr_list[3].find_elements(By.TAG_NAME, 'span')[-1].text
+                            if borrowed != "<$0.01":
+                                value -= float(borrowed.replace('$', '')) 
+                    
+                    
+                    data = {
+                        "Protocol": protocol,
+                        "DeFi Type": type,
+                        "Value": value
+                    }
+                    
+                    if value != 0:
+                        data_list.append(data)
+        except Exception as e:
+            print(f"Problem : {e}")        
         return data_list
 
     def getHoldAssets(self, hold_data: Dict[str, Dict[str, Union[str, float]]] ):
