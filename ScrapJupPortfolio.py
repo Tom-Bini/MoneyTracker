@@ -111,7 +111,7 @@ class ScrapJupPortfolio:
                     raw_value = tr_list[1].find_elements(By.TAG_NAME, 'span')[-1].text
                     value = 0
                     if raw_value != '<$0.01':
-                        value = raw_value.replace('$', '')
+                        value = float(raw_value.replace('$', ''))
                         print(value)
                     if len(tr_list) > 2:
                         reward = tr_list[3].find_elements(By.TAG_NAME, 'span')[-1].text
