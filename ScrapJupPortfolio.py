@@ -67,6 +67,7 @@ class ScrapJupPortfolio:
         hold_data = {}
         
         main = sb.find_element(By.TAG_NAME, 'main')
+        print(main.get_attribute('outerHTML'))
         holding_details = main.find_element(By.TAG_NAME, 'details')
         rows = holding_details.find_elements(By.TAG_NAME, 'tr')[1:]
         for row in rows:
