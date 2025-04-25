@@ -15,6 +15,7 @@ from typing import Dict, Union
 from datetime import datetime
 import yfinance as yf
 import re
+from pyvirtualdisplay import Display
 
 #A RETIRER AVANT D'UPLOAD :
 
@@ -195,6 +196,8 @@ if __name__ == "__main__":
     assets_list = []
     wallet_address = "9tfHcDsAPgZeAjWCwzC3aqY1C8NdfscDi5qAESt9vNNZ"
     with SB(uc=True, test=True, headless=False) as sb:
+        display = Display(visible=0, size=(1920, 1080))
+        display.start()
         sb.driver.set_window_size(1920, 1080)
         scraping = ScrapJupPortfolio(wallet_address, "test", "0", sb)
         
@@ -205,6 +208,8 @@ if __name__ == "__main__":
         defi = scraping.getDeFiPositionsData(sb)
         defi_assets = scraping.getDeFiAssets(defi)
         assets_list.extend(defi_assets)
+        display.stop()
+        scraping.kill()
         print(holdings)
         print(defi)
         print(f"Total assets to insert: {len(assets_list)}")
