@@ -58,7 +58,8 @@ class ScrapJupPortfolio:
         print(sb.get_page_title())
 
         print("Attente du chargement de la page...")
-        time.sleep(30)
+        time.sleep(15)
+        sb.save_screenshot("screenshot.png")
 
         self.hold_data = {}
         self.defi_data = {}
