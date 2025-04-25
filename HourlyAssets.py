@@ -35,6 +35,9 @@ if hour % 6 == 0:
     try:
         #On le fait que 4 fois par jour comme ça (limitation)
         hourlyRequestBank = RequestBankAccount(timestamp)
+        if hour == 18:
+            hourlyRequestBank.refresh_token() #On va reprendre un nouveau token Access
+            hourlyRequestBank = RequestBankAccount(timestamp) #On réinitialise l'objet avec le nouvel access token
         accounts_list = hourlyRequestBank.get_accounts()
         balances = hourlyRequestBank.get_balances(accounts_list)
         if balances != []:
