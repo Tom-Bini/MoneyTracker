@@ -54,10 +54,11 @@ class ScrapJupPortfolio:
         self.url = f"https://portfolio.jup.ag/portfolio/{wallet}"
         print(f"Ouverture de l'URL: {self.url}")
         sb.save_screenshot("screenshot1.png")
-        sb.uc_open_with_reconnect(self.url, 6)
+        sb.uc_open_with_reconnect(self.url, 4)
+        print(sb.find_element(By.TAG_NAME, "html").get_attribute("outerHTML"))
         sb.save_screenshot("screenshot2.png")
         print("🔍 Titre de la page:", sb.get_page_title())
-        time.sleep(5)
+        sb.sleep(5)
         sb.save_screenshot("screenshot3.png")
         try:
             sb.uc_gui_click_captcha()
