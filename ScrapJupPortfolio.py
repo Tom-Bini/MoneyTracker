@@ -184,7 +184,7 @@ class ScrapJupPortfolio:
 if __name__ == "__main__":
     assets_list = []
     wallet_address = "DHmzvbLXE9HJWjS1P2SVAjTNV32sp4xWRMtbmn3TWFCi"
-    with SB(uc=True, test=True) as sb:
+    with SB(uc=True, test=True, headed=True) as sb:
         sb.driver.set_window_size(1920, 1080)
         scraping = ScrapJupPortfolio(wallet_address, "test", "0", sb)
         
