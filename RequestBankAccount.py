@@ -108,8 +108,9 @@ class RequestBankAccount:
             'accept': 'application/json',
             "Authorization": f"Bearer {self.ACCESS_TOKEN}"
         }
-
-        return requests.get(url, headers = headers).json()["accounts"]
+        response = requests.get(url, headers = headers).json()
+        print(response)
+        return response["accounts"]
 
     def get_account_details(self, account):
         url = f"https://bankaccountdata.gocardless.com/api/v2/accounts/{account}/details/"
@@ -168,7 +169,9 @@ if __name__ == "__main__":
 
     hourlyRequestBank = RequestBankAccount(timestamp)
     accounts_list = hourlyRequestBank.get_accounts()
-    #balances = hourlyRequestBank.get_balances()
-    assets = hourlyRequestBank.get_assets(['75.74'])
+    print(accounts_list)
+    balances = hourlyRequestBank.get_balances(accounts_list)
+    print(balances)
+    assets = hourlyRequestBank.get_assets(balances)
     print(assets)
     

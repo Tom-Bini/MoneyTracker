@@ -31,7 +31,7 @@ hour = int(timestamp[-2:])
 
 do_sql_fallback = True
 #Assets From Banks
-if hour % 6 == 0:
+if hour % 6 == 1:
     try:
         #On le fait que 4 fois par jour comme ça (limitation)
         hourlyRequestBank = RequestBankAccount(timestamp)
