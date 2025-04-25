@@ -8,3 +8,8 @@ wallets_evm = {
 wallets_sui = {
     "Ledger Main": "0xb9cd25f3777db149c61ce62a819dd4ad4935399095998a1e4b406d7d3979cb0a"
 }
+
+wallets_solana = {
+    "Main Wallet": "DHmzvbLXE9HJWjS1P2SVAjTNV32sp4xWRMtbmn3TWFCi",
+    "Ledger Main": "9tfHcDsAPgZeAjWCwzC3aqY1C8NdfscDi5qAESt9vNNZ"
+}

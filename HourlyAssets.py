@@ -1,6 +1,7 @@
 from RequestBankAccount import RequestBankAccount
 from ScrapDebank import ScrapDebank
 from ScrapSuiVision import ScrapSuiVision
+from RequestBitget import RequestBitget
 from datetime import datetime
 from InteractSQL import InteractSQL
 from wallets import wallets_evm
@@ -99,6 +100,13 @@ for wallet_name in wallets_sui:
     scraping.kill()
     
     print(f"Total assets to insert: {len(assets_list)}")
+    
+#Assets from Bitget
+
+request = RequestBitget(timestamp)
+bitget_data = request.fetch_assets_snapshot()
+bitgetAssets = request.getHoldAssets(bitget_data)
+assets_list.extend(bitgetAssets)
 
 for asset in assets_list:
     print(f"Insertion de l'asset {asset}")
