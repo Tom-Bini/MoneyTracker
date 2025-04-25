@@ -56,7 +56,7 @@ class ScrapJupPortfolio:
         sb.uc_gui_click_captcha()
 
         print("Attente du chargement de la page...")
-        time.sleep(10)
+        time.sleep(15)
 
         self.hold_data = {}
         self.defi_data = {}
