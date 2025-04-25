@@ -194,9 +194,18 @@ class ScrapJupPortfolio:
 if __name__ == "__main__":
     display = Display(visible=0, size=(1920, 1080))
     display.start()
+    
+    chrome_options = [
+        "--disable-blink-features=AutomationControlled",
+        "--disable-dev-shm-usage",
+        "--no-sandbox",
+        "--disable-gpu",
+        "--window-size=1920,1080"
+    ]
+    
     assets_list = []
     wallet_address = "DHmzvbLXE9HJWjS1P2SVAjTNV32sp4xWRMtbmn3TWFCi"
-    with SB(uc=True, test=True, incognito=True, headless=False) as sb:
+    with SB(uc=True, test=True, incognito=True, headless=False, uc_cdp_events=True, chrome_options=chrome_options) as sb:
         sb.driver.set_window_size(1920, 1080)
         scraping = ScrapJupPortfolio(wallet_address, "test", "0", sb)
         
