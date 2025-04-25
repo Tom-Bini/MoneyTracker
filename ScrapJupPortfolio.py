@@ -52,18 +52,22 @@ class ScrapJupPortfolio:
 
         self.url = f"https://portfolio.jup.ag/portfolio/{wallet}"
         print(f"Ouverture de l'URL: {self.url}")
+        sb.save_screenshot("screenshot1.png")
         sb.uc_open_with_reconnect(self.url, 4)
+        sb.save_screenshot("screenshot2.png")
         print("🔍 Titre de la page:", sb.get_page_title())
         time.sleep(5)
+        sb.save_screenshot("screenshot3.png")
         try:
             sb.uc_gui_click_captcha()
+            sb.save_screenshot("screenshot4.png")
             print("✅ Tentative de clic sur le CAPTCHA")
         except Exception as e:
             print(f"⚠️ Erreur lors du clic CAPTCHA (peut être normal si rien à cliquer) : {e}")
             
         print("Attente du chargement de la page...")
         time.sleep(15)
-        sb.save_screenshot("screenshot.png")
+        sb.save_screenshot("screenshot5.png")
 
         self.hold_data = {}
         self.defi_data = {}
