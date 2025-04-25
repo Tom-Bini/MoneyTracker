@@ -6,7 +6,7 @@ with SB(uc=True, test=True, headless=False) as sb:
     url = "https://portfolio.jup.ag/portfolio/DHmzvbLXE9HJWjS1P2SVAjTNV32sp4xWRMtbmn3TWFCi"
     sb.open(url)  # Utilisation de open() au lieu de uc_open_with_reconnect
     print("Titre de la page:", sb.get_page_title())
-    time.sleep(5)
+    time.sleep(10)
     # Capture d'écran avant tentative de CAPTCHA
     sb.save_screenshot("before_captcha.png")
     
