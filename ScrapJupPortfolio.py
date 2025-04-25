@@ -198,7 +198,7 @@ if __name__ == "__main__":
     
     assets_list = []
     wallet_address = "9tfHcDsAPgZeAjWCwzC3aqY1C8NdfscDi5qAESt9vNNZ"
-    with SB(uc=True) as sb:
+    with SB(uc=True, test=True, xvfb=True) as sb:
         scraping = ScrapJupPortfolio(wallet_address, "test", "0", sb)
         
         holdings = scraping.getHoldingsData(sb)
