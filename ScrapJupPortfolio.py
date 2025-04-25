@@ -15,6 +15,7 @@ from typing import Dict, Union
 from datetime import datetime
 import yfinance as yf
 import re
+from pyvirtualdisplay import Display
 
 #A RETIRER AVANT D'UPLOAD :
 
@@ -191,6 +192,8 @@ class ScrapJupPortfolio:
         self.driver.quit()
         
 if __name__ == "__main__":
+    display = Display(visible=0, size=(1920, 1080))
+    display.start()
     assets_list = []
     wallet_address = "DHmzvbLXE9HJWjS1P2SVAjTNV32sp4xWRMtbmn3TWFCi"
     with SB(uc=True, test=True, incognito=True, headless=False) as sb:
@@ -206,4 +209,4 @@ if __name__ == "__main__":
         assets_list.extend(defi_assets)
         
         print(f"Total assets to insert: {len(assets_list)}")
-        
+        display.stop()
