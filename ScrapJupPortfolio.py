@@ -53,10 +53,14 @@ class ScrapJupPortfolio:
         self.url = f"https://portfolio.jup.ag/portfolio/{wallet}"
         print(f"Ouverture de l'URL: {self.url}")
         sb.uc_open_with_reconnect(self.url, 4)
-        print(sb.get_page_title())
-        sb.uc_gui_click_captcha()  # Only used if needed
-        print(sb.get_page_title())
+        print("🔍 Titre de la page:", sb.get_page_title())
 
+        try:
+            sb.uc_gui_click_captcha()
+            print("✅ Tentative de clic sur le CAPTCHA")
+        except Exception as e:
+            print(f"⚠️ Erreur lors du clic CAPTCHA (peut être normal si rien à cliquer) : {e}")
+            
         print("Attente du chargement de la page...")
         time.sleep(15)
         sb.save_screenshot("screenshot.png")
@@ -184,7 +188,7 @@ class ScrapJupPortfolio:
 if __name__ == "__main__":
     assets_list = []
     wallet_address = "DHmzvbLXE9HJWjS1P2SVAjTNV32sp4xWRMtbmn3TWFCi"
-    with SB(uc=True, test=True, headed=True) as sb:
+    with SB(uc=True, test=True) as sb:
         sb.driver.set_window_size(1920, 1080)
         scraping = ScrapJupPortfolio(wallet_address, "test", "0", sb)
         
