@@ -54,14 +54,14 @@ class ScrapJupPortfolio:
         self.url = f"https://portfolio.jup.ag/portfolio/{wallet}"
         print(f"Ouverture de l'URL: {self.url}")
         sb.save_screenshot("screenshot1.png")
-        sb.uc_open_with_reconnect(self.url, 4)
-        print(sb.find_element(By.TAG_NAME, "html").get_attribute("outerHTML"))
+        sb.activate_cdp_mode(self.url)
+        sb.sleep(2)
         sb.save_screenshot("screenshot2.png")
         print("🔍 Titre de la page:", sb.get_page_title())
         sb.sleep(5)
         sb.save_screenshot("screenshot3.png")
         try:
-            sb.uc_gui_click_captcha()
+            sb.cdp.gui_click_element("//div[p[text()='Proof of humanity required']]/div[1]")
             sb.save_screenshot("screenshot4.png")
             print("✅ Tentative de clic sur le CAPTCHA")
         except Exception as e:
