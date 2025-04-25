@@ -15,7 +15,6 @@ from typing import Dict, Union
 from datetime import datetime
 import yfinance as yf
 import re
-from pyvirtualdisplay import Display
 
 #A RETIRER AVANT D'UPLOAD :
 
@@ -140,7 +139,7 @@ class ScrapJupPortfolio:
                     raw_supplied = tr_list[1].find_elements(By.TAG_NAME, 'span')[-1].text
                     value = 0
                     if raw_supplied != '<$0.01':
-                        value = raw_supplied.replace('$', '')
+                        value = float(raw_supplied.replace('$', ''))
                         print(value)
                     if len(tr_list) > 2:
                         borrowed = tr_list[3].find_elements(By.TAG_NAME, 'span')[-1].text
@@ -192,12 +191,10 @@ class ScrapJupPortfolio:
         self.driver.quit()
         
 if __name__ == "__main__":
-    display = Display(visible=0, size=(1920, 1080))
-    display.start()
     
     assets_list = []
-    wallet_address = "DHmzvbLXE9HJWjS1P2SVAjTNV32sp4xWRMtbmn3TWFCi"
-    with SB(uc=True, test=True, incognito=True, headless=False, uc_cdp_events=True) as sb:
+    wallet_address = "9tfHcDsAPgZeAjWCwzC3aqY1C8NdfscDi5qAESt9vNNZ"
+    with SB(uc=True, test=True, headless=False) as sb:
         sb.driver.set_window_size(1920, 1080)
         scraping = ScrapJupPortfolio(wallet_address, "test", "0", sb)
         
@@ -208,6 +205,7 @@ if __name__ == "__main__":
         defi = scraping.getDeFiPositionsData(sb)
         defi_assets = scraping.getDeFiAssets(defi)
         assets_list.extend(defi_assets)
-        
+        print(holdings)
+        print(defi)
         print(f"Total assets to insert: {len(assets_list)}")
-        display.stop()
+        
