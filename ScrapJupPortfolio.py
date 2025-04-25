@@ -54,7 +54,7 @@ class ScrapJupPortfolio:
         print(f"Ouverture de l'URL: {self.url}")
         sb.uc_open_with_reconnect(self.url, 4)
         print("🔍 Titre de la page:", sb.get_page_title())
-
+        time.sleep(5)
         try:
             sb.uc_gui_click_captcha()
             print("✅ Tentative de clic sur le CAPTCHA")
