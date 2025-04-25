@@ -55,7 +55,6 @@ class ScrapJupPortfolio:
         print(f"Ouverture de l'URL: {self.url}")
         sb.save_screenshot("screenshot1.png")
         sb.uc_open_with_reconnect(self.url, 6)
-        sb.driver.default_get(self.url)
         sb.save_screenshot("screenshot2.png")
         print("🔍 Titre de la page:", sb.get_page_title())
         time.sleep(5)
@@ -189,16 +188,18 @@ class ScrapJupPortfolio:
         
     def kill(self):
         # Fermer le navigateur
-        self.driver.quit()
+        pass
         
 if __name__ == "__main__":
+    options = {
+        "capabilities": {
+            "goog:loggingPrefs": {"performance": "ALL"}
+        }
+    }   
     
     assets_list = []
     wallet_address = "9tfHcDsAPgZeAjWCwzC3aqY1C8NdfscDi5qAESt9vNNZ"
     with SB(uc=True, test=True, headless=False) as sb:
-        display = Display(visible=0, size=(1920, 1080))
-        display.start()
-        sb.driver.set_window_size(1920, 1080)
         scraping = ScrapJupPortfolio(wallet_address, "test", "0", sb)
         
         holdings = scraping.getHoldingsData(sb)
@@ -208,7 +209,6 @@ if __name__ == "__main__":
         defi = scraping.getDeFiPositionsData(sb)
         defi_assets = scraping.getDeFiAssets(defi)
         assets_list.extend(defi_assets)
-        display.stop()
         scraping.kill()
         print(holdings)
         print(defi)
