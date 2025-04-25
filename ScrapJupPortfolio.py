@@ -61,7 +61,7 @@ class ScrapJupPortfolio:
         sb.sleep(5)
         sb.save_screenshot("screenshot3.png")
         try:
-            sb.cdp.gui_click_element("div.fixed.left-0.right-0.top-0.z-50.flex.h-full.flex-col.items-center.justify-center.gap-2.bg-surface.p-8 > div")
+            sb.cdp.gui_click_element("div.fixed.left-0.right-0.top-0.z-50.flex.h-full.flex-col.items-center.justify-center.gap-2.bg-surface.p-8")
             sb.save_screenshot("screenshot4.png")
             print("✅ Tentative de clic sur le CAPTCHA")
         except Exception as e:
