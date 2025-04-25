@@ -53,7 +53,9 @@ class ScrapJupPortfolio:
         self.url = f"https://portfolio.jup.ag/portfolio/{wallet}"
         print(f"Ouverture de l'URL: {self.url}")
         sb.uc_open_with_reconnect(self.url, 4)
-        sb.uc_gui_click_captcha()
+        print(sb.get_page_title())
+        sb.uc_gui_click_captcha()  # Only used if needed
+        print(sb.get_page_title())
 
         print("Attente du chargement de la page...")
         time.sleep(15)
