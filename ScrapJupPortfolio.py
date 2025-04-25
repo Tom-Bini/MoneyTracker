@@ -58,7 +58,7 @@ class ScrapJupPortfolio:
         print(sb.get_page_title())
 
         print("Attente du chargement de la page...")
-        time.sleep(15)
+        time.sleep(30)
 
         self.hold_data = {}
         self.defi_data = {}
@@ -67,7 +67,6 @@ class ScrapJupPortfolio:
         hold_data = {}
         
         main = sb.find_element(By.TAG_NAME, 'main')
-        print(main.get_attribute('outerHTML'))
         holding_details = main.find_element(By.TAG_NAME, 'details')
         rows = holding_details.find_elements(By.TAG_NAME, 'tr')[1:]
         for row in rows:
