@@ -9,6 +9,8 @@ from wallets import wallets_sui
 from datetime import timedelta
 from Asset import Asset
 
+print("Début de l'exécution de HourlyAssets.py au timestamp : {}")
+
 def insert_asset(asset, db: InteractSQL):
     fields = list(asset.__dict__.keys())
     placeholders = ", ".join(["?" for _ in fields])
@@ -18,16 +20,20 @@ def insert_asset(asset, db: InteractSQL):
 
     query = f"INSERT INTO assets ({columns}) VALUES ({placeholders})"
     db.execute_query(query, values)
-
-sql = InteractSQL('DatabaseV1.db')
-sql.connect()
-
+    
 assets_list = []
         
 current_time = datetime.now()
 rounded_time = current_time.replace(minute = 0, second = 0, microsecond = 0)
 timestamp = rounded_time.strftime("%Y-%m-%d %H")
 hour = int(timestamp[-2:])
+
+print(f"Début de l'exécution de HourlyAssets.py à : {current_time}")
+
+sql = InteractSQL('DatabaseV1.db')
+sql.connect()
+
+
 
 do_sql_fallback = True
 #Assets From Banks
@@ -36,6 +42,7 @@ if hour % 6 == 1:
         #On le fait que 4 fois par jour comme ça (limitation)
         hourlyRequestBank = RequestBankAccount(timestamp)
         if hour == 18:
+            print("Refresh de l'access token quotidien")
             hourlyRequestBank.refresh_token() #On va reprendre un nouveau token Access
             hourlyRequestBank = RequestBankAccount(timestamp) #On réinitialise l'objet avec le nouvel access token
         accounts_list = hourlyRequestBank.get_accounts()
@@ -45,7 +52,7 @@ if hour % 6 == 1:
             assets_list.extend(hourlyRequestBank.get_assets(balances))
         
     except Exception as e:
-        print(f"Problem : {e}")
+        print(f"Problème dans la requête à la banque : {e}")
 
 if do_sql_fallback:
     # S'exécute si l'heure n'est pas un multiple de 6 ou s'il y a un problème
@@ -82,7 +89,7 @@ for wallet_name in wallets_evm:
     
     scraping.kill()
     
-    print(f"Total assets to insert: {len(assets_list)}")
+    print(f"Total assets to insert from EVM: {len(assets_list)}")
     
 #Assets from SUI
 
@@ -102,7 +109,7 @@ for wallet_name in wallets_sui:
     
     scraping.kill()
     
-    print(f"Total assets to insert: {len(assets_list)}")
+    print(f"Total assets to insert from SUI: {len(assets_list)}")
     
 #Assets from Bitget
 
@@ -112,5 +119,7 @@ bitgetAssets = request.getHoldAssets(bitget_data)
 assets_list.extend(bitgetAssets)
 
 for asset in assets_list:
-    print(f"Insertion de l'asset {asset}")
     insert_asset(asset, sql)
+    
+print(f"Insertion de {len(assets_list)} assets avec succès !")
+print("fin de Hourly Assets")
