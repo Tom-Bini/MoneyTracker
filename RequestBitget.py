@@ -79,9 +79,6 @@ class RequestBitget:
                 price = self.get_usdt_price(ticker)
             if price is None:
                 continue  # skip if price not found
-            print(ticker)
-            print(amount)
-            print(price)
             total_value = amount * price
             snapshot.append({
                 "ticker": ticker,
