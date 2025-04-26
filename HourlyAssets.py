@@ -78,12 +78,12 @@ for wallet_name in wallets_evm:
     scraping = ScrapDebank(wallet_address, wallet_name, timestamp)
     
     holding_data = scraping.getHoldingsData()
-    print(holding_data)
+    #print(holding_data)
     holdAssets = scraping.getHoldAssets(holding_data)
     assets_list.extend(holdAssets)
 
     data_list = scraping.getDeFiPositionsData()
-    print(data_list)
+    #print(data_list)
     defiAssets = scraping.getDeFiAssets(data_list)
     assets_list.extend(defiAssets)
     
@@ -98,12 +98,12 @@ for wallet_name in wallets_sui:
     scraping = ScrapSuiVision(wallet_address, wallet_name, timestamp)
     
     holding_data = scraping.getHoldingsData()
-    print(holding_data)
+    #print(holding_data)
     holdAssets = scraping.getHoldAssets(holding_data)
     assets_list.extend(holdAssets)
 
     data_list = scraping.getDeFiPositionsData()
-    print(data_list)
+    #print(data_list)
     defiAssets = scraping.getDeFiAssets(data_list)
     assets_list.extend(defiAssets)
     
