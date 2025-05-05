@@ -45,7 +45,7 @@ if hour % 6 == 5:
         hourlyRequestBank = RequestBankAccount(timestamp)
         if hour == 5:
             
-            if day % 7 == 5:
+            if day % 30 == 5:
                 print("Refresh des 2 tokens hebdomadaire")
                 hourlyRequestBank.get_tokens #On va reprendre un nouveau token Access et un nouveau token Refresh
             else:
