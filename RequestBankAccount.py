@@ -24,14 +24,14 @@ class RequestBankAccount:
         self.btc_usd = yf.Ticker("BTC-USD").history(period="1d")["Close"].iloc[-1]
         self.timestamp = timestamp
 
-    def get_tokens(self, secret_id, secret_key):
+    def get_tokens(self):
         # URL pour obtenir les tokens
         url = "https://bankaccountdata.gocardless.com/api/v2/token/new/"
         
         # Prépare le payload avec secret_id et secret_key
         payload = {
-            "secret_id": secret_id,
-            "secret_key": secret_key
+            "secret_id": self.SECRET_ID,
+            "secret_key": self.SECRET_KEY
         }
 
         # En-têtes HTTP requis
@@ -51,10 +51,11 @@ class RequestBankAccount:
         # Si la réponse est OK, récupère les tokens
         data = response.json()
         print(data)
-        access_token = data["access"]
-        refresh_token = data["refresh"]
+        new_access_token = data["access"]
+        new_refresh_token = data["refresh"]
+        set_key(".env", "GOCARDLESS_ACCESS_TOKEN", new_access_token)
+        set_key(".env", "GOCARDLESS_REFRESH_TOKEN", new_refresh_token)
         
-        return access_token, refresh_token
 
     def refresh_token(self):
         url = "https://bankaccountdata.gocardless.com/api/v2/token/refresh/"

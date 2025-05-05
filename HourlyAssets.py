@@ -27,6 +27,7 @@ current_time = datetime.now()
 rounded_time = current_time.replace(minute = 0, second = 0, microsecond = 0)
 timestamp = rounded_time.strftime("%Y-%m-%d %H")
 hour = int(timestamp[-2:])
+day = rounded_time.day
 
 print(f"Début de l'exécution de HourlyAssets.py à : {current_time}")
 
@@ -37,13 +38,20 @@ sql.connect()
 
 do_sql_fallback = True
 #Assets From Banks
-if hour % 6 == 0:
+
+if hour % 6 == 5:
     try:
         #On le fait que 4 fois par jour comme ça (limitation)
         hourlyRequestBank = RequestBankAccount(timestamp)
-        if hour == 0:
-            print("Refresh de l'access token quotidien")
-            hourlyRequestBank.refresh_token() #On va reprendre un nouveau token Access
+        if hour == 5:
+            
+            if day % 7 == 5:
+                print("Refresh des 2 tokens hebdomadaire")
+                hourlyRequestBank.get_tokens #On va reprendre un nouveau token Access et un nouveau token Refresh
+            else:
+                print("Refresh de l'access token quotidien")
+                hourlyRequestBank.refresh_token() #On va reprendre un nouveau token Access
+                
             hourlyRequestBank = RequestBankAccount(timestamp) #On réinitialise l'objet avec le nouvel access token
         accounts_list = hourlyRequestBank.get_accounts()
         balances = hourlyRequestBank.get_balances(accounts_list)
