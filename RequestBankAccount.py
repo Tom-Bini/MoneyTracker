@@ -169,6 +169,7 @@ if __name__ == "__main__":
     timestamp = rounded_time.strftime("%Y-%m-%d %H")
 
     hourlyRequestBank = RequestBankAccount(timestamp)
+    
     accounts_list = hourlyRequestBank.get_accounts()
     print(accounts_list)
     balances = hourlyRequestBank.get_balances(accounts_list)
