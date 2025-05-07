@@ -47,6 +47,8 @@ class ScrapDebank:
         response2.raise_for_status()
         self.btc_usd = response2.json()["bitcoin"]["usd"]
         
+        self.usd_eur = self.btc_eur / self.btc_usd
+        
         options = Options()
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')

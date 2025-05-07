@@ -55,6 +55,8 @@ class ScrapJupPortfolio:
         response2 = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
         response2.raise_for_status()
         self.btc_usd = response2.json()["bitcoin"]["usd"]
+        
+        self.usd_eur = self.btc_eur / self.btc_usd
 
         self.url = f"https://sonar.watch/portfolio/{wallet}"
         print(f"Ouverture de l'URL: {self.url}")
