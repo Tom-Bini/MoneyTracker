@@ -11,7 +11,7 @@ import time
 import os
 from typing import Dict, Union
 from datetime import datetime
-import yfinance as yf
+import requests
 import re
 
 def safe_float_convert(s: str) -> float:
@@ -38,9 +38,14 @@ class ScrapDebank:
         self.wallet = wallet
         self.wallet_name = wallet_name
         self.timestamp = timestamp
-        self.usd_eur = yf.Ticker("USDEUR=X").history(period="1d")["Close"].iloc[-1]
-        self.btc_eur = yf.Ticker("BTC-EUR").history(period="1d")["Close"].iloc[-1]
-        self.btc_usd = yf.Ticker("BTC-USD").history(period="1d")["Close"].iloc[-1]
+        response1 = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur")
+        response1.raise_for_status()
+        self.btc_eur = response1.json()["bitcoin"]["eur"]
+
+
+        response2 = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
+        response2.raise_for_status()
+        self.btc_usd = response2.json()["bitcoin"]["usd"]
         
         options = Options()
         options.add_argument('--headless')

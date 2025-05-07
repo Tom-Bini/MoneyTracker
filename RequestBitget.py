@@ -10,7 +10,6 @@ import os
 from Asset import Asset
 from AssetType import AssetType
 from AssetSource import AssetSource
-import yfinance as yf
 
 class RequestBitget:
     def __init__(self, timestamp):
@@ -22,9 +21,18 @@ class RequestBitget:
         self.API_PASSPHRASE = os.getenv("BITGET_API_PASSPHRASE")
         self.timestamp = timestamp
         
-        self.usd_eur = yf.Ticker("USDEUR=X").history(period="1d")["Close"].iloc[-1]
-        self.btc_eur = yf.Ticker("BTC-EUR").history(period="1d")["Close"].iloc[-1]
-        self.btc_usd = yf.Ticker("BTC-USD").history(period="1d")["Close"].iloc[-1]
+        response1 = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur")
+        response1.raise_for_status()
+        self.btc_eur = response1.json()["bitcoin"]["eur"]
+
+
+        response2 = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
+        response2.raise_for_status()
+        self.btc_usd = response2.json()["bitcoin"]["usd"]
+
+        self.usd_eur = self.btc_eur / self.btc_usd
+        
+
 
     def get_headers(self, method, request_path, body=""):
         timestamp = str(int(time.time() * 1000))
@@ -112,8 +120,10 @@ class RequestBitget:
 
 if __name__ == "__main__":
     request = RequestBitget("0")
-    assets_data = request.fetch_assets_snapshot()
-    print(assets_data)
-    assets_list = request.getHoldAssets(assets_data)
-    print(assets_list)
-    
+    #assets_data = request.fetch_assets_snapshot()
+    #print(assets_data)
+    #assets_list = request.getHoldAssets(assets_data)
+    #print(assets_list)
+    print("btc/eur :", request.btc_eur)
+    print("btc/usd :", request.btc_usd)
+    print("usd/eur :", request.usd_eur)

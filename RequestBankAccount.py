@@ -3,7 +3,6 @@ import requests
 from dotenv import load_dotenv
 from dotenv import set_key
 import json
-import yfinance as yf
 from Asset import Asset
 from AssetType import AssetType
 from AssetSource import AssetSource
@@ -19,9 +18,18 @@ class RequestBankAccount:
         self.REFRESH_TOKEN = os.getenv("GOCARDLESS_REFRESH_TOKEN")
         self.BANK_ID = os.getenv("GOCARDLESS_BANK_ID")
         self.REQUISITION_ID = os.getenv("GOCARDLESS_REQUISITION_ID")
-        self.usd_eur = yf.Ticker("USDEUR=X").history(period="1d")["Close"].iloc[-1]
-        self.btc_eur = yf.Ticker("BTC-EUR").history(period="1d")["Close"].iloc[-1]
-        self.btc_usd = yf.Ticker("BTC-USD").history(period="1d")["Close"].iloc[-1]
+        
+        response1 = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur")
+        response1.raise_for_status()
+        self.btc_eur = response1.json()["bitcoin"]["eur"]
+
+
+        response2 = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
+        response2.raise_for_status()
+        self.btc_usd = response2.json()["bitcoin"]["usd"]
+
+        self.usd_eur = self.btc_eur / self.btc_usd
+        
         self.timestamp = timestamp
 
     def get_tokens(self):
@@ -50,7 +58,6 @@ class RequestBankAccount:
         
         # Si la réponse est OK, récupère les tokens
         data = response.json()
-        print(data)
         new_access_token = data["access"]
         new_refresh_token = data["refresh"]
         set_key(".env", "GOCARDLESS_ACCESS_TOKEN", new_access_token)

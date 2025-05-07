@@ -13,7 +13,7 @@ import time
 import os
 from typing import Dict, Union
 from datetime import datetime
-import yfinance as yf
+import requests
 import re
 from pyvirtualdisplay import Display
 
@@ -47,11 +47,16 @@ class ScrapJupPortfolio:
         self.wallet = wallet
         self.wallet_name = wallet_name
         self.timestamp = timestamp
-        self.usd_eur = yf.Ticker("USDEUR=X").history(period="1d")["Close"].iloc[-1]
-        self.btc_eur = yf.Ticker("BTC-EUR").history(period="1d")["Close"].iloc[-1]
-        self.btc_usd = yf.Ticker("BTC-USD").history(period="1d")["Close"].iloc[-1]
+        response1 = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur")
+        response1.raise_for_status()
+        self.btc_eur = response1.json()["bitcoin"]["eur"]
 
-        self.url = f"https://portfolio.jup.ag/portfolio/{wallet}"
+
+        response2 = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
+        response2.raise_for_status()
+        self.btc_usd = response2.json()["bitcoin"]["usd"]
+
+        self.url = f"https://sonar.watch/portfolio/{wallet}"
         print(f"Ouverture de l'URL: {self.url}")
         sb.save_screenshot("screenshot1.png")
         sb.activate_cdp_mode(self.url)
@@ -61,6 +66,7 @@ class ScrapJupPortfolio:
         sb.sleep(5)
         sb.save_screenshot("screenshot3.png")
         try:
+            
             sb.cdp.gui_click_element("div.fixed.left-0.right-0.top-0.z-50.flex.h-full.flex-col.items-center.justify-center.gap-2.bg-surface.p-8")
             sb.save_screenshot("screenshot4.png")
             print("✅ Tentative de clic sur le CAPTCHA")

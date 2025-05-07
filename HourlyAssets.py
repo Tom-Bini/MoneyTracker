@@ -39,14 +39,14 @@ sql.connect()
 do_sql_fallback = True
 #Assets From Banks
 
-if hour % 6 == 5:
+if hour % 6 == 0:
     try:
         #On le fait que 4 fois par jour comme ça (limitation)
         hourlyRequestBank = RequestBankAccount(timestamp)
-        if hour == 5:
+        if hour == 0:
             
-            if day % 30 == 5:
-                print("Refresh des 2 tokens hebdomadaire")
+            if day % 15 == 0:
+                print("Refresh des 2 tokens 2 fois par mois")
                 hourlyRequestBank.get_tokens #On va reprendre un nouveau token Access et un nouveau token Refresh
             else:
                 print("Refresh de l'access token quotidien")
