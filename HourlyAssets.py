@@ -101,13 +101,13 @@ for wallet_name in wallets_evm:
     
     holding_data = scraping.getHoldingsData()
     #print(holding_data)
-    holdAssets = scraping.getHoldAssets(holding_data)
-    assets_list.extend(holdAssets)
+    hold_assets = scraping.getHoldAssets(holding_data)
+    assets_list.extend(hold_assets)
 
     data_list = scraping.getDeFiPositionsData()
     #print(data_list)
-    defiAssets = scraping.getDeFiAssets(data_list)
-    assets_list.extend(defiAssets)
+    defi_assets = scraping.getDeFiAssets(data_list)
+    assets_list.extend(defi_assets)
     
     scraping.kill()
     
@@ -121,13 +121,13 @@ for wallet_name in wallets_sui:
     
     holding_data = scraping.getHoldingsData()
     #print(holding_data)
-    holdAssets = scraping.getHoldAssets(holding_data)
-    assets_list.extend(holdAssets)
+    hold_assets = scraping.getHoldAssets(holding_data)
+    assets_list.extend(hold_assets)
 
     data_list = scraping.getDeFiPositionsData()
     #print(data_list)
-    defiAssets = scraping.getDeFiAssets(data_list)
-    assets_list.extend(defiAssets)
+    defi_assets = scraping.getDeFiAssets(data_list)
+    assets_list.extend(defi_assets)
     
     scraping.kill()
     
