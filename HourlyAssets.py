@@ -2,6 +2,7 @@ from RequestBankAccount import RequestBankAccount
 from ScrapDebank import ScrapDebank
 from ScrapSuiVision import ScrapSuiVision
 from RequestBitget import RequestBitget
+from RequestHyperliquid import RequestHyperliquid
 from datetime import datetime
 from InteractSQL import InteractSQL
 from wallets import wallets_evm
@@ -84,6 +85,15 @@ if do_sql_fallback:
     # Passe la liste des montants extraits en argument à la fonction
     assets_list.extend(RequestBankAccount(timestamp, rates).get_assets(amounts))
     
+    
+#Assets from Hyperliquid
+for wallet_name in wallets_evm:
+    wallet_address = wallets_evm[wallet_name]
+    request = RequestHyperliquid("0x9c7AaA2876517920041769f0D385f8cBb8893086", "test", "0", FetchExchangeRates())
+    balances = request.getHoldings()
+    hold_assets = request.getHoldAssets(balances)
+    assets_list.extend(hold_assets)
+
 #Assets from EVM
 for wallet_name in wallets_evm:
     wallet_address = wallets_evm[wallet_name]
