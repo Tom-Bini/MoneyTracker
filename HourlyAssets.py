@@ -89,10 +89,11 @@ if do_sql_fallback:
 #Assets from Hyperliquid
 for wallet_name in wallets_evm:
     wallet_address = wallets_evm[wallet_name]
-    request = RequestHyperliquid("0x9c7AaA2876517920041769f0D385f8cBb8893086", "test", "0", FetchExchangeRates())
+    request = RequestHyperliquid(wallet_address, wallet_name, timestamp, rates)
     balances = request.getHoldings()
     hold_assets = request.getHoldAssets(balances)
     assets_list.extend(hold_assets)
+    print(f"Total assets to insert from Hyperliquid: {len(hold_assets)}")
 
 #Assets from EVM
 for wallet_name in wallets_evm:
@@ -111,7 +112,7 @@ for wallet_name in wallets_evm:
     
     scraping.kill()
     
-    print(f"Total assets to insert from EVM: {len(assets_list)}")
+    print(f"Total assets to insert from EVM: {len(hold_assets) + len(defi_assets)}")
     
 #Assets from SUI
 
@@ -131,7 +132,7 @@ for wallet_name in wallets_sui:
     
     scraping.kill()
     
-    print(f"Total assets to insert from SUI: {len(assets_list)}")
+    print(f"Total assets to insert from SUI: {len(hold_assets) + len(defi_assets)}")
     
 #Assets from Bitget
 
