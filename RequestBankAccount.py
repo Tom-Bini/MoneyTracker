@@ -7,9 +7,10 @@ from Asset import Asset
 from AssetType import AssetType
 from AssetSource import AssetSource
 from datetime import datetime
+from FetchExchangeRates import FetchExchangeRates
 
 class RequestBankAccount:
-    def __init__(self, timestamp):
+    def __init__(self, timestamp, rates: FetchExchangeRates):
         # Charger les clés depuis le fichier .env
         load_dotenv()
         self.SECRET_ID = os.getenv("GOCARDLESS_SECRET_ID")
@@ -19,16 +20,9 @@ class RequestBankAccount:
         self.BANK_ID = os.getenv("GOCARDLESS_BANK_ID")
         self.REQUISITION_ID = os.getenv("GOCARDLESS_REQUISITION_ID")
         
-        response1 = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur")
-        response1.raise_for_status()
-        self.btc_eur = response1.json()["bitcoin"]["eur"]
-
-
-        response2 = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
-        response2.raise_for_status()
-        self.btc_usd = response2.json()["bitcoin"]["usd"]
-
-        self.usd_eur = self.btc_eur / self.btc_usd
+        self.btc_eur = rates.getBtcEur()
+        self.btc_usd = rates.getBtcUsd()
+        self.usd_eur = rates.getUsdEur()
         
         self.timestamp = timestamp
 

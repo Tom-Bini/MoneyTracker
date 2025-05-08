@@ -8,8 +8,7 @@ from wallets import wallets_evm
 from wallets import wallets_sui
 from datetime import timedelta
 from Asset import Asset
-
-print("Début de l'exécution de HourlyAssets.py au timestamp : {}")
+from FetchExchangeRates import FetchExchangeRates
 
 def insert_asset(asset, db: InteractSQL):
     fields = list(asset.__dict__.keys())
@@ -31,6 +30,11 @@ day = rounded_time.day
 
 print(f"Début de l'exécution de HourlyAssets.py à : {current_time}")
 
+try:
+    rates = FetchExchangeRates()
+except Exception as e:
+    print(f"Problème dans la écupération des taux d'échange : {e}")
+
 sql = InteractSQL('DatabaseV1.db')
 sql.connect()
 
@@ -42,7 +46,7 @@ do_sql_fallback = True
 if hour % 6 == 0:
     try:
         #On le fait que 4 fois par jour comme ça (limitation)
-        hourlyRequestBank = RequestBankAccount(timestamp)
+        hourlyRequestBank = RequestBankAccount(timestamp, rates)
         if hour == 0:
             
             if day % 15 == 0:
@@ -52,7 +56,7 @@ if hour % 6 == 0:
                 print("Refresh de l'access token quotidien")
                 hourlyRequestBank.refresh_token() #On va reprendre un nouveau token Access
                 
-            hourlyRequestBank = RequestBankAccount(timestamp) #On réinitialise l'objet avec le nouvel access token
+            hourlyRequestBank = RequestBankAccount(timestamp, rates) #On réinitialise l'objet avec le nouvel access token
         accounts_list = hourlyRequestBank.get_accounts()
         balances = hourlyRequestBank.get_balances(accounts_list)
         if balances != []:
@@ -78,12 +82,12 @@ if do_sql_fallback:
     print("Valeurs récupérées en dépit de :", amounts)
 
     # Passe la liste des montants extraits en argument à la fonction
-    assets_list.extend(RequestBankAccount(timestamp).get_assets(amounts))
+    assets_list.extend(RequestBankAccount(timestamp, rates).get_assets(amounts))
     
 #Assets from EVM
 for wallet_name in wallets_evm:
     wallet_address = wallets_evm[wallet_name]
-    scraping = ScrapDebank(wallet_address, wallet_name, timestamp)
+    scraping = ScrapDebank(wallet_address, wallet_name, timestamp, rates)
     
     holding_data = scraping.getHoldingsData()
     #print(holding_data)
@@ -103,7 +107,7 @@ for wallet_name in wallets_evm:
 
 for wallet_name in wallets_sui:
     wallet_address = wallets_sui[wallet_name]
-    scraping = ScrapSuiVision(wallet_address, wallet_name, timestamp)
+    scraping = ScrapSuiVision(wallet_address, wallet_name, timestamp, rates)
     
     holding_data = scraping.getHoldingsData()
     #print(holding_data)
@@ -121,7 +125,7 @@ for wallet_name in wallets_sui:
     
 #Assets from Bitget
 
-request = RequestBitget(timestamp)
+request = RequestBitget(timestamp, rates)
 bitget_data = request.fetch_assets_snapshot()
 bitgetAssets = request.getHoldAssets(bitget_data)
 assets_list.extend(bitgetAssets)

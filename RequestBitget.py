@@ -10,9 +10,10 @@ import os
 from Asset import Asset
 from AssetType import AssetType
 from AssetSource import AssetSource
+from FetchExchangeRates import FetchExchangeRates
 
 class RequestBitget:
-    def __init__(self, timestamp):
+    def __init__(self, timestamp, rates: FetchExchangeRates):
         
         load_dotenv()
         self.BASE_URL = "https://api.bitget.com"
@@ -21,18 +22,9 @@ class RequestBitget:
         self.API_PASSPHRASE = os.getenv("BITGET_API_PASSPHRASE")
         self.timestamp = timestamp
         
-        response1 = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur")
-        response1.raise_for_status()
-        self.btc_eur = response1.json()["bitcoin"]["eur"]
-
-
-        response2 = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
-        response2.raise_for_status()
-        self.btc_usd = response2.json()["bitcoin"]["usd"]
-
-        self.usd_eur = self.btc_eur / self.btc_usd
-        
-
+        self.btc_eur = rates.getBtcEur()
+        self.btc_usd = rates.getBtcUsd()
+        self.usd_eur = rates.getUsdEur()
 
     def get_headers(self, method, request_path, body=""):
         timestamp = str(int(time.time() * 1000))

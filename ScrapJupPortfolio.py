@@ -16,6 +16,7 @@ from datetime import datetime
 import requests
 import re
 from pyvirtualdisplay import Display
+from FetchExchangeRates import FetchExchangeRates
 
 #A RETIRER AVANT D'UPLOAD :
 
@@ -43,20 +44,14 @@ def safe_float_convert(s: str) -> float:
     return float(s)
 
 class ScrapJupPortfolio:
-    def __init__(self, wallet: str, wallet_name: str, timestamp: str, sb: SB):
+    def __init__(self, wallet: str, wallet_name: str, timestamp: str, sb: SB, rates: FetchExchangeRates):
         self.wallet = wallet
         self.wallet_name = wallet_name
         self.timestamp = timestamp
-        response1 = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur")
-        response1.raise_for_status()
-        self.btc_eur = response1.json()["bitcoin"]["eur"]
-
-
-        response2 = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
-        response2.raise_for_status()
-        self.btc_usd = response2.json()["bitcoin"]["usd"]
         
-        self.usd_eur = self.btc_eur / self.btc_usd
+        self.btc_eur = rates.getBtcEur()
+        self.btc_usd = rates.getBtcUsd()
+        self.usd_eur = rates.getUsdEur()
 
         self.url = f"https://sonar.watch/portfolio/{wallet}"
         print(f"Ouverture de l'URL: {self.url}")
