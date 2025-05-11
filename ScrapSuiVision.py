@@ -141,7 +141,7 @@ class ScrapSuiVision:
                 data = {
                     "Protocol": protocol,
                     "DeFi Type": type,
-                    "Value": float(value)
+                    "Value": safe_float_convert(value)
                 }
                 
                 data_list.append(data)
