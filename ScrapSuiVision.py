@@ -134,14 +134,14 @@ class ScrapSuiVision:
             sections = main.find_elements(By.TAG_NAME, 'section')[1:]
             for section in sections:
                 protocol_element = section.find_element(By.TAG_NAME, "h2")
-                protocol, value = protocol_element.text.strip().replace('$', '').split()
+                protocol, value = protocol_element.text.strip().replace('$', '').replace(",", "").split()
 
                 type = "Lending Borrowing"
 
                 data = {
                     "Protocol": protocol,
                     "DeFi Type": type,
-                    "Value": safe_float_convert(value)
+                    "Value": float(value)
                 }
                 
                 data_list.append(data)
