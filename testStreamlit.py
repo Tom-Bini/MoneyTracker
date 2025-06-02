@@ -79,8 +79,8 @@ def main():
     st.subheader(f"Évolution de la valeur totale en {selected_currency}")
     line_chart(df_value, selected_currency)
 
-    # 3) Graphique d'évolution de la répartition par type
-    st.subheader("Évolution de la répartition des assets par type")
+    # 3) Graphique d'évolution de la répartition par type (en pourcentage)
+    st.subheader("Évolution de la répartition des assets par type (%)")
     
     # Préparer les données pour le graphique en aires empilées
     df_stacked = (
@@ -90,32 +90,39 @@ def main():
         .reset_index()
         .pivot(index='timestamp', columns='type', values='value_in_EUR')
         .fillna(0)  # Remplacer les NaN par 0
-        .reset_index()
     )
+    
+    # Calculer les pourcentages pour chaque timestamp
+    df_percentage = df_stacked.div(df_stacked.sum(axis=1), axis=0) * 100
+    df_percentage = df_percentage.reset_index()
     
     # Convertir en format long pour Plotly
-    df_melted = df_stacked.melt(
+    df_melted = df_percentage.melt(
         id_vars=['timestamp'], 
         var_name='type', 
-        value_name='value_in_EUR'
+        value_name='percentage'
     )
     
-    # Créer le graphique en aires empilées
+    # Créer le graphique en aires empilées avec pourcentages
     fig = px.area(
         df_melted,
         x='timestamp',
-        y='value_in_EUR',
+        y='percentage',
         color='type',
-        title="Évolution de la répartition des assets par type (€)",
+        title="Évolution de la répartition des assets par type (%)",
         color_discrete_map={'Bitcoin': '#F4B401','Altcoin':'#26A96C','DeFi':'#2BC016','Fiat':'#387D7A'}
     )
     
     # Améliorer l'affichage
     fig.update_layout(
         xaxis_title="Temps",
-        yaxis_title="Valeur (€)",
+        yaxis_title="Pourcentage (%)",
+        yaxis=dict(range=[0, 100]),  # Fixer l'axe Y entre 0 et 100%
         hovermode='x unified'
     )
+    
+    # Personnaliser le format du hover
+    fig.update_traces(hovertemplate='%{y:.1f}%<extra></extra>')
     
     st.plotly_chart(fig)
 
