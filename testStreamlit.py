@@ -79,25 +79,52 @@ def main():
     st.subheader(f"Évolution de la valeur totale en {selected_currency}")
     line_chart(df_value, selected_currency)
 
-    # 3) Slider pour sélectionner un timestamp
-    st.subheader("Sélection du timestamp pour le camembert")
-    timestamps = df_value['timestamp'].tolist()
-    selected_ts = st.select_slider(
-        "Choisissez une heure", 
-        options=timestamps, 
-        value=timestamps[0] if timestamps else datetime.now()
+    # 3) Graphique d'évolution de la répartition par type
+    st.subheader("Évolution de la répartition des assets par type")
+    
+    # Préparer les données pour le graphique en aires empilées
+    df_stacked = (
+        df
+        .groupby(['timestamp', 'type'])['value_in_EUR']
+        .sum()
+        .reset_index()
+        .pivot(index='timestamp', columns='type', values='value_in_EUR')
+        .fillna(0)  # Remplacer les NaN par 0
+        .reset_index()
     )
+    
+    # Convertir en format long pour Plotly
+    df_melted = df_stacked.melt(
+        id_vars=['timestamp'], 
+        var_name='type', 
+        value_name='value_in_EUR'
+    )
+    
+    # Créer le graphique en aires empilées
+    fig = px.area(
+        df_melted,
+        x='timestamp',
+        y='value_in_EUR',
+        color='type',
+        title="Évolution de la répartition des assets par type (€)",
+        color_discrete_map={'Bitcoin': '#F4B401','Altcoin':'#26A96C','DeFi':'#2BC016','Fiat':'#387D7A'}
+    )
+    
+    # Améliorer l'affichage
+    fig.update_layout(
+        xaxis_title="Temps",
+        yaxis_title="Valeur (€)",
+        hovermode='x unified'
+    )
+    
+    st.plotly_chart(fig)
 
-    # 4) Filtrer les assets pour ce timestamp et afficher le camembert
-    df_sel = df[df['timestamp'] == selected_ts]
-    st.subheader(f"Répartition des assets au {selected_ts.strftime('%Y-%m-%d %H')}h")
-    pie_chart(df_sel)
-
-    # 5) (Optionnel) Afficher la table filtrée
-    if not df_sel.empty:
-        st.write(df_sel)
-    else:
-        st.write("Aucune donnée disponible pour ce timestamp.")
+    # 4) (Optionnel) Afficher un aperçu des données récentes
+    st.subheader("Aperçu des données récentes")
+    latest_timestamp = df['timestamp'].max()
+    df_latest = df[df['timestamp'] == latest_timestamp]
+    st.write(f"Données pour {latest_timestamp.strftime('%Y-%m-%d %H')}h :")
+    st.write(df_latest)
 
 if __name__ == "__main__":
     main()
