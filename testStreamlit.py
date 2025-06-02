@@ -15,7 +15,14 @@ def get_data(query):
     conn.close()
     return df
 
-# Fonction pour afficher le graphique camembert
+# Configuration des monnaies
+CURRENCIES = {
+    'EUR': {'column': 'value_in_EUR', 'symbol': '€', 'total_column': 'total_value_in_EUR'},
+    'USD': {'column': 'value_in_USD', 'symbol': '$', 'total_column': 'total_value_in_USD'},
+    'BTC': {'column': 'value_in_BTC', 'symbol': '₿', 'total_column': 'total_value_in_BTC'}
+}
+
+# Fonction pour afficher le graphique camembert (toujours en EUR)
 def pie_chart(df):
     grouped = df.groupby('type').agg({'value_in_EUR':'sum'}).reset_index()
     fig = px.pie(
@@ -28,18 +35,30 @@ def pie_chart(df):
     )
     st.plotly_chart(fig)
 
-# Fonction pour afficher le graphique de la valeur totale en €
-def line_chart(df):
+# Fonction pour afficher le graphique de la valeur totale
+def line_chart(df, currency):
+    currency_info = CURRENCIES[currency]
     fig = px.line(
         df, 
         x='timestamp', 
-        y='total_value_in_EUR', 
-        title="Évolution de la valeur totale en €"
+        y=currency_info['total_column'], 
+        title=f"Évolution de la valeur totale en {currency} ({currency_info['symbol']})"
     )
     st.plotly_chart(fig)
 
 def main():
     st.title("Money Tracker Dashboard")
+    
+    # Sélecteur de monnaie en haut de la page
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        selected_currency = st.selectbox(
+            "Choisissez la monnaie :",
+            options=list(CURRENCIES.keys()),
+            index=0  # EUR par défaut
+        )
+    
+    currency_info = CURRENCIES[selected_currency]
 
     # 1) On charge tous les assets récents
     df = get_data("SELECT * FROM assets WHERE timestamp >= '2025-01-01'")
@@ -48,17 +67,17 @@ def main():
     df['timestamp'] = pd.to_datetime(df['timestamp'], format="%Y-%m-%d %H")
 
     # 2) Graphique de l'évolution
-    # On agrège pour la line chart
+    # On agrège pour la line chart selon la monnaie sélectionnée
     df_value = (
         df
-        .groupby('timestamp')['value_in_EUR']
+        .groupby('timestamp')[currency_info['column']]
         .sum()
-        .reset_index(name='total_value_in_EUR')
+        .reset_index(name=currency_info['total_column'])
         .sort_values('timestamp')
     )
 
-    st.subheader("Évolution de la valeur totale en €")
-    line_chart(df_value)
+    st.subheader(f"Évolution de la valeur totale en {selected_currency}")
+    line_chart(df_value, selected_currency)
 
     # 3) Slider pour sélectionner un timestamp
     st.subheader("Sélection du timestamp pour le camembert")
@@ -66,7 +85,7 @@ def main():
     selected_ts = st.select_slider(
         "Choisissez une heure", 
         options=timestamps, 
-        value=timestamps[0]
+        value=timestamps[0] if timestamps else datetime.now()
     )
 
     # 4) Filtrer les assets pour ce timestamp et afficher le camembert
@@ -75,7 +94,10 @@ def main():
     pie_chart(df_sel)
 
     # 5) (Optionnel) Afficher la table filtrée
-    st.write(df_sel)
+    if not df_sel.empty:
+        st.write(df_sel)
+    else:
+        st.write("Aucune donnée disponible pour ce timestamp.")
 
 if __name__ == "__main__":
     main()
