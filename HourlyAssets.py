@@ -1,6 +1,7 @@
 from RequestBankAccount import RequestBankAccount
 from ScrapDebank import ScrapDebank
 from ScrapSuiVision import ScrapSuiVision
+from ScrapSFL import ScrapSFL
 from RequestBitget import RequestBitget
 from RequestHyperliquid import RequestHyperliquid
 from datetime import datetime
@@ -113,6 +114,14 @@ for wallet_name in wallets_evm:
     scraping.kill()
     
     print(f"Total assets to insert from EVM: {len(hold_assets) + len(defi_assets)}")
+    
+#Asset from SFL
+
+scraping = ScrapSFL(timestamp, rates)
+value = scraping.getFarmValueInDollar()
+print(f"Value of SFL Farm : {value}$")
+assets_list.extend(scraping.getAsset(value))
+scraping.kill()
     
 #Assets from SUI
 
