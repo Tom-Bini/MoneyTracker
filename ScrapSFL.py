@@ -101,32 +101,10 @@ class ScrapSFL:
         
         return value
 
-    def getHoldAssets(self, hold_data: Dict[str, Dict[str, Union[str, float]]] ):
-        btc_tickers = {"BTC", "CBBTC", "WBTC"}
-        usd_stables = {"USDC", "USDT", "USR", "DAI", "USDC.E", "USDT.E", "USD₮0"}
-        eur_stables = {"EURC"}
-        
+    def getAsset(self, value):
         assets_list = []
-        for ticker in hold_data:
-            ticker_upper = ticker.upper()
-            price = hold_data[ticker]['price']
-            amount = hold_data[ticker]['amount']
-            if ticker_upper in btc_tickers:
-                assets_list.append(Asset(ticker, AssetType.BTC, AssetSource.EVM, self.timestamp, "USD", self.usd_eur, self.btc_eur, self.btc_usd, amount, price, amount * price, ticker, wallet_name = self.wallet_name))
-            elif ticker_upper in usd_stables:
-                assets_list.append(Asset(ticker, AssetType.FIAT, AssetSource.EVM, self.timestamp, "USD", self.usd_eur, self.btc_eur, self.btc_usd, amount, price, amount * price, ticker, wallet_name = self.wallet_name))
-            elif ticker_upper in eur_stables:
-                assets_list.append(Asset(ticker, AssetType.FIAT, AssetSource.EVM, self.timestamp, "USD", self.usd_eur, self.btc_eur, self.btc_usd, amount, price, amount * price, ticker, wallet_name = self.wallet_name))
-            else:
-                assets_list.append(Asset(ticker, AssetType.ALTCOIN, AssetSource.EVM, self.timestamp, "USD", self.usd_eur, self.btc_eur, self.btc_usd, amount, price, amount * price, ticker, wallet_name = self.wallet_name))
+        assets_list.append(Asset("SFL Farm", AssetType.DEFI, AssetSource.EVM, self.timestamp, "USD", self.usd_eur, self.btc_eur, self.btc_usd, value = float(value), wallet_name = self.wallet_name, defi_type = "Gaming"))
             
-        return assets_list
-
-    def getDeFiAssets(self, defi_data):
-        assets_list = []
-        
-        for data in defi_data:
-            assets_list.append(Asset(data["Protocol"], AssetType.DEFI, AssetSource.SUI, self.timestamp, "USD", self.usd_eur, self.btc_eur, self.btc_usd, value = float(data["Value"]), wallet_name = self.wallet_name, defi_type = data["DeFi Type"]))
         return assets_list
         
     def kill(self):
@@ -141,7 +119,7 @@ if __name__ == "__main__":
         rates = FetchExchangeRates()
         scraping = ScrapSFL("0", rates)
         
-        print(scraping.getFarmValueInDollar())
+        assets_list.append(scraping.getAsset(scraping.getFarmValueInDollar()))
         
         scraping.kill()
         
