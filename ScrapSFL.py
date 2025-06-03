@@ -92,7 +92,6 @@ class ScrapSFL:
         self.defi_data = {}
     
     def getFarmValueInDollar(self):
-        value
         
         try:
             value = self.driver.find_element(By.TAG_NAME, "h4").text
