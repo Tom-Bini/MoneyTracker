@@ -117,10 +117,14 @@ for wallet_name in wallets_evm:
     
 #Asset from SFL
 
+
 scraping = ScrapSFL(timestamp, rates)
-value = scraping.getFarmValueInDollar()
-print(f"Value of SFL Farm : {value}$")
-assets_list.extend(scraping.getAsset(value))
+try:
+    value = scraping.getFarmValueInDollar()
+    print(f"Value of SFL Farm : {value}$")
+    assets_list.extend(scraping.getAsset(value))
+except Exception as e:
+    print(f"Erreur dans la requete SFL, erreur : {e}")
 scraping.kill()
     
 #Assets from SUI
