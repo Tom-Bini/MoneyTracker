@@ -87,14 +87,14 @@ if do_sql_fallback:
     assets_list.extend(RequestBankAccount(timestamp, rates).get_assets(amounts))
     
     
-#Assets from Hyperliquid
+"""#Assets from Hyperliquid
 for wallet_name in wallets_evm:
     wallet_address = wallets_evm[wallet_name]
     request = RequestHyperliquid(wallet_address, wallet_name, timestamp, rates)
     balances = request.getHoldings()
     hold_assets = request.getHoldAssets(balances)
     assets_list.extend(hold_assets)
-    print(f"Total assets to insert from Hyperliquid: {len(hold_assets)}")
+    print(f"Total assets to insert from Hyperliquid: {len(hold_assets)}")""" #Tracké par rabby mtn donc osef
 
 #Assets from EVM
 for wallet_name in wallets_evm:
