@@ -190,7 +190,7 @@ class ScrapDebank:
         assets_list = []
         
         for data in defi_data:
-            assets_list.append(Asset(data["Protocol"], AssetType.DEFI, AssetSource.EVM, self.timestamp, "USD", self.usd_eur, self.btc_eur, self.btc_usd, value = float(data["Value"]), wallet_name = self.wallet_name, defi_type = data["DeFi Type"]))
+            assets_list.append(Asset(data["Protocol"], AssetType.DEFI, AssetSource.EVM, self.timestamp, "USD", self.usd_eur, self.btc_eur, self.btc_usd, value = float(data["Value"].replace(",", "")), wallet_name = self.wallet_name, defi_type = data["DeFi Type"]))
         return assets_list
         
     def kill(self):
