@@ -1,8 +1,8 @@
 import sqlite3
 
 # === CONFIGURATION ===
-timestamp_a_supprimer = "2025-07-16 09:00:00"  # ← Modifie cette ligne pour supprimer une autre heure
-nom_table = "nom_de_ta_table"  # ← Remplace par le nom réel de ta table
+timestamp_a_supprimer = "2025-07-16 08:00:00"
+nom_table = "assets"
 
 # Connexion à la base de données
 conn = sqlite3.connect("DatabaseV1.db")
