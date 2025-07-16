@@ -1,7 +1,7 @@
 import sqlite3
 
 # === CONFIGURATION ===
-timestamp_a_supprimer = "2025-07-11 17"
+timestamp_a_supprimer = "2025-05-29 14"
 nom_table = "assets"
 
 # Connexion à la base de données
