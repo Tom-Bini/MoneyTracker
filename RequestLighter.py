@@ -31,8 +31,15 @@ class RequestLighter:
         )
         try:
             account_api = lighter.AccountApi(client)
-            acc = await account_api.account(by="l1_address", value=self.wallet)
-            return float(acc.accounts[0].total_asset_value)
+            try:
+                acc = await account_api.account(by="l1_address", value=self.wallet)
+                return float(acc.accounts[0].total_asset_value)
+            except lighter.exceptions.BadRequestException as e:
+                if "account not found" in str(e):
+                    print(f"⚠️ Lighter: compte non trouvé pour {self.wallet}")
+                    return 0.0
+                else:
+                    raise e  # On relance si c’est une autre erreur
         finally:
             await client.close()
 
