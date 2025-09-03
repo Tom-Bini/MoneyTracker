@@ -181,6 +181,8 @@ if __name__ == "__main__":
     timestamp = rounded_time.strftime("%Y-%m-%d %H")
 
     hourlyRequestBank = RequestBankAccount(timestamp, rates)
+    hourlyRequestBank.get_tokens()
+    hourlyRequestBank.refresh_token()
     hourlyRequestBank.create_link()
     # accounts_list = hourlyRequestBank.get_accounts()
     # print(accounts_list)
