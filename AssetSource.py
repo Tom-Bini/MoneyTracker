@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class AssetSource(Enum):
     TRADEREPUBLIC = "Trade Republic"
     BELFIUS = "Belfius"
@@ -8,3 +9,4 @@ class AssetSource(Enum):
     BTC = "BTC Blockchain"
     SOLANA = "Solana Blockchain"
     SUI = "SUI Blockchain"
+    LIGHTER = "Lighter"
